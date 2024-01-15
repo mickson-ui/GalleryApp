@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">GalleryApp</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirmPassword">Confirm Password</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create Account</string>
+    <string name="name">Fullname</string>
+    <string name="register">Register</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="account">Account</string>
+    <string name="home">Home</string>
+    <string name="cart">Cart</string>
+    <string name="search">Search for items</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#080808</color>
+    <color name="blue">#3B82F6</color>
+    <color name="buttonOL">#3B82F6</color>
+    <color name="green">#B6F866</color>
+    <color name="textBTOutline">#A0AAC3</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
