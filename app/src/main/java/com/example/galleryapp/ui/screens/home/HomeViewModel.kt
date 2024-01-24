@@ -9,6 +9,7 @@ import com.example.galleryapp.network.GalleryApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeViewModel : ViewModel() {
 
@@ -16,33 +17,34 @@ class HomeViewModel : ViewModel() {
     val arts: State<List<Art>> = _arts
 
     init {
-        // Simulating API call in the init block
         viewModelScope.launch(Dispatchers.IO) {
-            // Simulating network delay
-            delay(2000)
-
-            // Replace this block with actual API call using Retrofit
             try {
                 Log.d("HomeViewModel", "Making API call...")
 
                 val response = GalleryApi.retrofitService.getAllArt()
 
-                if (response.isSuccessful) {
-                    Log.d("HomeViewModel", "API call successful")
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Log.d("HomeViewModel", "API call successful")
 
-                    val artsResponse = response.body()
-                    artsResponse?.let {
-                        _arts.value = it.arts
+                        val artsResponse = response.body()
+                        Log.d("HomeViewModel", "API call successful: $artsResponse")
+                        artsResponse?.let {
+                            _arts.value = it.arts
+                        }
+                    } else {
+                        Log.e("HomeViewModel", "API call failed with response code: ${response.code()}")
+                        // Handle error case
+                        // You can set an error state or log the error
                     }
-                } else {
-                    Log.e("HomeViewModel", "API call failed with response code: ${response.code()}")
-                    // Handle error case
-                    // You can set an error state or log the error
                 }
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "Exception during API call", e)
-                // Handle exception
+                withContext(Dispatchers.Main) {
+                    Log.e("HomeViewModel", "Exception during API call", e)
+                    // Handle exception
+                }
             }
         }
     }
+
 }

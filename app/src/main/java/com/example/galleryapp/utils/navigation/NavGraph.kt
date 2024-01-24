@@ -13,13 +13,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,9 +31,7 @@ import com.example.galleryapp.ui.screens.cart.CartPage
 import com.example.galleryapp.ui.screens.cart.dummyCartItems
 import com.example.galleryapp.ui.screens.checkout.CheckoutPage
 import com.example.galleryapp.ui.screens.home.HomePage
-//import com.example.galleryapp.ui.screens.home.dummyData
-//import com.example.galleryapp.ui.screens.itemDetails.ItemDetailsPage
-import com.example.galleryapp.ui.screens.itemDetails.dummyItemDetails
+import com.example.galleryapp.ui.screens.itemDetails.ItemDetailsPage
 import com.example.galleryapp.ui.screens.login.LoginPage
 import com.example.galleryapp.ui.screens.register.RegisterPage
 import com.example.galleryapp.ui.screens.upload.UploadPage
@@ -53,20 +51,17 @@ fun NavGraph(
         composable(Screen.HomePage.route) {
             currentRoute = Screen.HomePage.route
             HomePage(navController = navController,
-                selectedItem = { selectedItem ->
-                    navController.navigate("${Screen.ItemDetailsPage.route}/$selectedItem")
+                onItemSelected = { onItemSelected ->
+                    navController.navigate("${Screen.ItemDetailsPage.route}/$onItemSelected")
                 }/*, onFavoriteClicked = {}*/)
         }
-//        composable(Screen.ItemDetailsPage.route + "/{selectedItemId}") { backStackEntry ->
-//            val selectedItemId =
-//                backStackEntry.arguments?.getString("selectedItemId")?.toIntOrNull() ?: 0
-//            val selectedItem = dummyData.find { it.id == selectedItemId } ?: dummyData.first()
-//
-//            ItemDetailsPage(
-//                navController = navController,
-//                itemDetails = selectedItem,
-//                onAddToCart = {})
-//        }
+        composable(Screen.ItemDetailsPage.route + "/{onItemSelected}") { backStackEntry ->
+            val onItemSelected = rememberUpdatedState(backStackEntry.arguments?.getString("onItemSelected") ?: "")
+            ItemDetailsPage(
+                navController = navController,
+                selectedItem = onItemSelected
+            ) {}
+        }
         composable(Screen.CartPage.route) {
             currentRoute = Screen.CartPage.route
             CartPage(
@@ -81,7 +76,7 @@ fun NavGraph(
         }
         composable(Screen.UploadPage.route) {
             currentRoute = Screen.UploadPage.route
-            UploadPage(navController = navController, uploadViewModel = viewModel())
+            UploadPage(navController = navController/*, uploadViewModel = viewModel()*/)
         }
         composable(Screen.AccountPage.route) {
             currentRoute = Screen.AccountPage.route
@@ -99,7 +94,8 @@ fun NavGraph(
 
 @Composable
 fun BottomBar(
-    navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
+    navController: NavHostController,
+    state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
         Screen.HomePage, Screen.CartPage, Screen.UploadPage, Screen.AccountPage

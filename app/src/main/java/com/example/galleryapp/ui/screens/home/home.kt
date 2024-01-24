@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -31,7 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun HomePage(
     navController: NavHostController,
-    selectedItem: (Art) -> Unit,
+    onItemSelected: (String) -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val buttonsVisible = remember { mutableStateOf(true) }
@@ -66,13 +68,14 @@ fun HomePage(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .padding(top = 65.dp)
+//                .verticalScroll(rememberScrollState())
         ) {
             items(arts) { art ->
                 GalleryCard(
                     galleryItem = art,
-                ) { selectedItem ->
-                    println("Selected item ID: ${selectedItem.id}")
-                    navController.navigate("${Screen.ItemDetailsPage.route}/${selectedItem.id.toString()}")
+                ) { onItemSelected ->
+                    println("Selected item ID from home: ${onItemSelected.id}")
+                    navController.navigate("${Screen.ItemDetailsPage.route}/${onItemSelected}")
                 }
             }
         }
@@ -113,9 +116,9 @@ fun GalleryCard(
 //                )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = galleryItem.name, style = MaterialTheme.typography.labelSmall)
+            Text(text = galleryItem.name, style = MaterialTheme.typography.headlineLarge)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Price: ${galleryItem.price}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Price: ${galleryItem.price}", style = MaterialTheme.typography.displaySmall)
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
@@ -126,5 +129,5 @@ fun GalleryCard(
 @Composable
 fun HomePagePreview(){
     val navController = rememberNavController()
-    HomePage(selectedItem = {}, /*onFavoriteClicked = {},*/ navController = navController)
+    HomePage(onItemSelected = {}, /*onFavoriteClicked = {},*/ navController = navController)
 }

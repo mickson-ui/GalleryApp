@@ -68,10 +68,17 @@ dependencies {
     implementation ("androidx.camera:camera-camera2:1.4.0-alpha03")
     implementation ("androidx.camera:camera-lifecycle:1.4.0-alpha03")
     implementation ("androidx.camera:camera-view:1.4.0-alpha03")
-    implementation ("io.coil-kt:coil-compose:1.3.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    implementation ("com.google.accompanist:accompanist-insets:0.19.0")
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.19.0")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.19.0")
 
+    //For rememberLauncherForActivityResult()
+    implementation ("androidx.activity:activity-compose:1.8.2")
 
+//For PickVisualMedia contract
+    implementation ("androidx.activity:activity-ktx:1.8.2")
+    implementation("io.coil-kt:coil-compose:2.2.2")
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 // Retrofit with Scalar Converter
