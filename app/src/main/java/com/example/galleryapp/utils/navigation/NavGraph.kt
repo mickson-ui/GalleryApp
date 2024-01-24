@@ -26,13 +26,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.galleryapp.ui.screens.account.AccountPage
 import com.example.galleryapp.ui.screens.cart.CartPage
 import com.example.galleryapp.ui.screens.cart.dummyCartItems
 import com.example.galleryapp.ui.screens.checkout.CheckoutPage
 import com.example.galleryapp.ui.screens.home.HomePage
-import com.example.galleryapp.ui.screens.home.dummyData
-import com.example.galleryapp.ui.screens.itemDetails.ItemDetailsPage
+//import com.example.galleryapp.ui.screens.home.dummyData
+//import com.example.galleryapp.ui.screens.itemDetails.ItemDetailsPage
 import com.example.galleryapp.ui.screens.itemDetails.dummyItemDetails
+import com.example.galleryapp.ui.screens.login.LoginPage
+import com.example.galleryapp.ui.screens.register.RegisterPage
 import com.example.galleryapp.ui.screens.upload.UploadPage
 
 
@@ -45,35 +48,53 @@ fun NavGraph(
     var currentRoute by remember { mutableStateOf(Screen.HomePage.route) }
     NavHost(
         navController = navController,
-        startDestination = Screen.HomePage.route
+        startDestination = Screen.LoginPage.route
     ) {
         composable(Screen.HomePage.route) {
             currentRoute = Screen.HomePage.route
             HomePage(navController = navController,
-                selectedItem = {
-                    selectedItem -> navController.navigate("${Screen.ItemDetailsPage.route}/$selectedItem")
-            }, onFavoriteClicked = {})
+                selectedItem = { selectedItem ->
+                    navController.navigate("${Screen.ItemDetailsPage.route}/$selectedItem")
+                }/*, onFavoriteClicked = {}*/)
         }
-        composable(Screen.ItemDetailsPage.route + "/{selectedItemId}") { backStackEntry ->
-            val selectedItemId = backStackEntry.arguments?.getString("selectedItemId")?.toIntOrNull() ?: 0
-            val selectedItem = dummyData.find { it.id == selectedItemId } ?: dummyData.first()
-
-            ItemDetailsPage(navController = navController, itemDetails = selectedItem, onAddToCart = {})
-        }
+//        composable(Screen.ItemDetailsPage.route + "/{selectedItemId}") { backStackEntry ->
+//            val selectedItemId =
+//                backStackEntry.arguments?.getString("selectedItemId")?.toIntOrNull() ?: 0
+//            val selectedItem = dummyData.find { it.id == selectedItemId } ?: dummyData.first()
+//
+//            ItemDetailsPage(
+//                navController = navController,
+//                itemDetails = selectedItem,
+//                onAddToCart = {})
+//        }
         composable(Screen.CartPage.route) {
             currentRoute = Screen.CartPage.route
-            CartPage(navController = navController,cartItems = dummyCartItems, onCheckoutClicked = {})
+            CartPage(
+                navController = navController,
+                cartItems = dummyCartItems,
+                onCheckoutClicked = {},
+            )
         }
         composable(Screen.CheckoutPage.route) {
             currentRoute = Screen.CheckoutPage.route
             CheckoutPage(navController = navController)
         }
-        composable(Screen.UploadPage.route){
+        composable(Screen.UploadPage.route) {
             currentRoute = Screen.UploadPage.route
             UploadPage(navController = navController, uploadViewModel = viewModel())
         }
+        composable(Screen.AccountPage.route) {
+            currentRoute = Screen.AccountPage.route
+            AccountPage(navController = navController)
+        }
+        composable(Screen.LoginPage.route) {
+            LoginPage(navController = navController)
+        }
+        composable(Screen.RegisterPage.route) {
+            RegisterPage(navController = navController)
+        }
+        // Bottom Navigation Bar}
     }
-    // Bottom Navigation Bar
 }
 
 @Composable
@@ -81,7 +102,7 @@ fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Screen.HomePage, Screen.CartPage, Screen.UploadPage
+        Screen.HomePage, Screen.CartPage, Screen.UploadPage, Screen.AccountPage
     )
 
     NavigationBar(

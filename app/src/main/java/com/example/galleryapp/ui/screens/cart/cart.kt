@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -22,9 +23,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.galleryapp.ui.screens.home.Art
 import com.example.galleryapp.ui.screens.home.GalleryCard
-import com.example.galleryapp.ui.screens.home.GalleryItem
 import com.example.galleryapp.utils.navigation.BottomBar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.setValue
+import com.example.galleryapp.ui.screens.home.HomeViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,9 +38,11 @@ import com.example.galleryapp.utils.navigation.BottomBar
 fun CartPage(
     navController: NavHostController,
     cartItems: List<CartItem>,
-    onCheckoutClicked: () -> Unit
+    onCheckoutClicked: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
 ) {
     val buttonsVisible = remember { mutableStateOf(true) }
+    val arts by remember { viewModel.arts }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,19 +63,13 @@ fun CartPage(
             modifier = Modifier
                 .padding(top = 70.dp)
         ) {
-            items(cartItems) { cartItem ->
+            items(arts) { art ->
                 GalleryCard(
-                    galleryItem = GalleryItem(
-                        id = cartItem.id,
-                        itemName = cartItem.itemName,
-                        price = cartItem.price,
-                        imageUrl = cartItem.imageUrl,
-                        isFavorite = false,
-                        description = "This is a sample item description. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                    ),
-                    onItemSelected = { /* Handle item click in the cart */ },
-                    onFavoriteClicked = { /* Handle favorite action */ }
-                )
+                    galleryItem = art,
+                ) { selectedItem ->
+                    println("Selected item ID: ${selectedItem.id}")
+                    navController.navigate("${Screen.ItemDetailsPage.route}/${selectedItem.id.toString()}")
+                }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
