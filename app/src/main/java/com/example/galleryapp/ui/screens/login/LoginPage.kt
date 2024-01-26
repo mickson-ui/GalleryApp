@@ -21,13 +21,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -47,8 +41,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.galleryapp.R
 import com.example.galleryapp.network.GalleryApi
 import com.example.galleryapp.network.LoginUser
-import com.example.galleryapp.ui.screens.register.User
-import com.example.galleryapp.utils.navigation.AuthService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -63,10 +55,6 @@ fun LoginPage(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-
-    val authService = AuthService()
-//    val snackbarHostState = remember {SnackbarHostState()}
 
     Column(
         modifier = Modifier
@@ -113,6 +101,7 @@ fun LoginPage(navController: NavController) {
                                     SessionManager(context = context).apply {
                                         token = registrationResponse.tokenDto.token
                                         email = registrationResponse.user.email
+                                        userId = registrationResponse.user.id
                                     }
                                     Toast.makeText(
                                         context,

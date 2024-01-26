@@ -1,26 +1,25 @@
 package com.example.galleryapp.ui.screens.upload
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -35,12 +34,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.galleryapp.utils.navigation.BottomBar
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -52,20 +49,30 @@ fun UploadPage(
 ) {
     val context = LocalContext.current
     val buttonsVisible = remember { mutableStateOf(true) }
-    //The URI of the photo that the user has picked
-    var photoUri: Uri? by remember { mutableStateOf(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        //When the user has selected a photo, its URI is returned here
-        photoUri = uri
-    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            uri?.let {
+                uploadViewModel.photoUri = it
+            }
+        }
+    )
     val itemName by uploadViewModel.itemName
     val itemPrice by uploadViewModel.itemPrice
     val itemDescription by uploadViewModel.itemDescription
+
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = "Upload Item") },
+                actions = {
+                    IconButton(
+                        onClick = { navController.navigate(Screen.LoginPage.route)}
+                    ) {
+                        Icon(imageVector = Icons.Default.ExitToApp, contentDescription = null)
+                    }
+                }
             )
         },
         bottomBar = {
@@ -82,36 +89,23 @@ fun UploadPage(
                 .padding(16.dp, end = 16.dp, top = 70.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
+
+            uploadViewModel.photoUri?.let {
+                Image(
+                    painter = rememberAsyncImagePainter(model = uploadViewModel.photoUri),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            TextButton(
                 onClick = {
-                    //On button press, launch the photo picker
-                    launcher.launch(PickVisualMediaRequest(
-                        //Here we request only photos. Change this to .ImageAndVideo if
-                        //you want videos too.
-                        //Or use .VideoOnly if you only want videos.
-                        mediaType = ActivityResultContracts.PickVisualMedia.ImageAndVideo
-                    )
-                    )
+                    launcher.launch("image/*")
                 }
             ) {
-                Text("Select Photo")
-            }
-            if (photoUri != null) {
-                //Use Coil to display the selected image
-                val painter = rememberAsyncImagePainter(
-                    ImageRequest
-                        .Builder(LocalContext.current)
-                        .data(data = photoUri)
-                        .build()
-                )
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .fillMaxWidth()
-                        .border(6.0.dp, Color.Gray),
-                    contentScale = ContentScale.Crop
+                Text(
+                    text = "Pick image"
                 )
             }
             // Input fields
@@ -142,7 +136,8 @@ fun UploadPage(
             Spacer(modifier = Modifier.height(16.dp))
             // Button to upload item
             Button(
-                onClick = { uploadViewModel.uploadItemToDatabase() },
+                onClick = { uploadViewModel.uploadItemToDatabase(context)
+                          navController.navigate("home") },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Upload Item")

@@ -66,9 +66,9 @@ fun CartPage(
             items(arts) { art ->
                 GalleryCard(
                     galleryItem = art,
-                ) { selectedItem ->
-                    println("Selected item ID: ${selectedItem.id}")
-                    navController.navigate("${Screen.ItemDetailsPage.route}/${selectedItem.id.toString()}")
+                ) {
+                    println("Selected item ID: ${art.id}")
+                    navController.navigate("${Screen.ItemDetailsPage.route}/${art.id.toString()}")
                 }
             }
         }

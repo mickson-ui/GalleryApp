@@ -11,12 +11,19 @@ class SessionManager(context: Context) {
     companion object {
         private const val KEY_TOKEN = "token"
         private const val KEY_EMAIL = "email"
+        private const val KEY_USERID = "userID"
     }
 
     var token: String?
         get() = sharedPreferences.getString(KEY_TOKEN, null)
         set(value) {
             editor.putString(KEY_TOKEN, value).apply()
+        }
+
+    var userId: String?
+        get() = sharedPreferences.getString(KEY_USERID, null)
+        set(value) {
+            editor.putString(KEY_USERID, value).apply()
         }
 
     var email: String?

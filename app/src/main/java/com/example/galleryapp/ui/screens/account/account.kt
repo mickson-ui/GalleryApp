@@ -95,7 +95,6 @@ fun AccountPage(
             // Display account details
             userResponse?.let { userResponseValue ->
                 // Display user details and arts
-                Text("User ID: ${userResponseValue.user.email}")
                 Text("User Name: ${userResponseValue.user.fullName}")
                 Text("Email: ${userResponseValue.user.email}")
 

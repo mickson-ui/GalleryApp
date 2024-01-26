@@ -2,16 +2,22 @@ package com.example.galleryapp.ui.screens.itemDetails
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,11 +32,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.galleryapp.R
+import com.example.galleryapp.utils.ImageConverter
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,16 +53,20 @@ fun ItemDetailsPage(
     selectedItem: State<String>,
     onAddToCart: () -> Unit
 ) {
-    val arts by remember { viewModel.arts }
+    val arts by remember { viewModel.itemDetails }
 
-    LaunchedEffect(selectedItem) {
-        viewModel.getItemDetails(token = null, selectedItemId = selectedItem)
+    val itemId: String = selectedItem.value
+
+    LaunchedEffect(itemId) {
+        viewModel.getItem(selectedItemId = itemId)
     }
-    Log.d("Selected Item ID", "ID from at details: $selectedItem")
+
+    Log.d("Item details page", "ID from home: $itemId")
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = arts?.responseMessage?: "Item Details") },
+                title = { Text(text = "Item Details") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
@@ -59,9 +74,14 @@ fun ItemDetailsPage(
                 },
                 actions = {
                     IconButton(
-                        onClick = { /* Handle favorite action */ }
+                        onClick = {
+                            // Call the deleteItem function when delete button is clicked
+                            viewModel.deleteItem(selectedItemId = itemId)
+                            // Navigate back to the home page
+                            navController.popBackStack()
+                        }
                     ) {
-                        Icon(imageVector = Icons.Default.Favorite, contentDescription = null)
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                     }
                 }
             )
@@ -72,42 +92,48 @@ fun ItemDetailsPage(
                 .fillMaxSize()
                 .padding(start = 16.dp, end = 16.dp, top = 75.dp)
         ) {
-//            Image(
-//                painter = painterResource(id = userResponse?.arts?.firstOrNull()?.imageUrl ?: R.drawable.img1),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(200.dp)
-//                    .clip(RoundedCornerShape(8.dp)),
-//                contentScale = ContentScale.Crop
-//            )
             Spacer(modifier = Modifier.height(16.dp))
             if (arts != null) {
                 Log.d("ItemDetailsPage", "ItemResponse is not null")
 
-                val art = arts!!.arts
+                val art = arts?.art
+                val bitmap = art?.let { it1 -> ImageConverter().base64ToImageBitmap(it1.image) }
                 Log.d("Items from details", "items $art")
 
-                if (art.isNotEmpty()) {
-                    Log.d("Item DetailsPage", "arts is not empty")
-                    // Accessing the properties only if the data is not null or empty
+                Log.d("Item DetailsPage", "arts is not empty")
+                // Accessing the properties only if the data is not null or empty
+                bitmap?.let {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    ) {
+                        Image(
+                            bitmap = it,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                Text(
+                    text = "Price: ${art?.price}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                art?.description?.let { it1 ->
                     Text(
-                        text = "Price: ${art.first().price}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = art.first().description,
+                        text = it1,
                         style = MaterialTheme.typography.bodyMedium
                     )
-                } else {
-                    Log.d("ItemDetailsPage", "arts is empty")
-                    // Handle the case where the data is empty
-                    Text(text = "No data available")
                 }
+
             } else {
-                Log.d("Item DetailsPage", "ItemResponse is null")
+                Log.d("Item DetailsPage", "Item Response is null")
                 // Handle the case where userResponse is null
                 Text(text = "No data available")
             }

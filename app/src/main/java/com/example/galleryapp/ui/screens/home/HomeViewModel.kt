@@ -26,9 +26,7 @@ class HomeViewModel : ViewModel() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Log.d("HomeViewModel", "API call successful")
-
                         val artsResponse = response.body()
-                        Log.d("HomeViewModel", "API call successful: $artsResponse")
                         artsResponse?.let {
                             _arts.value = it.arts
                         }
@@ -41,6 +39,35 @@ class HomeViewModel : ViewModel() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Log.e("HomeViewModel", "Exception during API call", e)
+                    // Handle exception
+                }
+            }
+        }
+    }
+
+    fun refreshItems() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                Log.d("HomeViewModel", "Refreshing items...")
+
+                val response = GalleryApi.retrofitService.getAllArt()
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Log.d("HomeViewModel", "Refresh successful")
+                        val artsResponse = response.body()
+                        artsResponse?.let {
+                            _arts.value = it.arts
+                        }
+                    } else {
+                        Log.e("HomeViewModel", "Refresh failed with response code: ${response.code()}")
+                        // Handle error case
+                        // You can set an error state or log the error
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("HomeViewModel", "Exception during refresh", e)
                     // Handle exception
                 }
             }

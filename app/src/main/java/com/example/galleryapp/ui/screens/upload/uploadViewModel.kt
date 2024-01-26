@@ -1,23 +1,22 @@
 package com.example.galleryapp.ui.screens.upload
 
-import androidx.compose.runtime.State
+import SessionManager
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.galleryapp.network.GalleryApi
-import com.example.galleryapp.network.GalleryApiService
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.example.galleryapp.utils.ImageConverter
 
-class UploadViewModel : ViewModel() {
+
+class UploadViewModel: ViewModel() {
     // State variables to observe in the UI
     private val _itemName = mutableStateOf("")
     val itemName get() = _itemName
@@ -28,36 +27,29 @@ class UploadViewModel : ViewModel() {
     private val _itemDescription = mutableStateOf("")
     val itemDescription get() = _itemDescription
 
-    // Function to handle item name changes
+    var photoUri: Uri? by   mutableStateOf(null)
+
     fun onItemNameChanged(newName: String) {
         _itemName.value = newName
     }
-
-    // Function to handle item price changes
     fun onItemPriceChanged(newPrice: String) {
         _itemPrice.value = newPrice
     }
-
-    // Function to handle item description changes
     fun onItemDescriptionChanged(newDescription: String) {
         _itemDescription.value = newDescription
     }
 
-    // Function to upload item to the database
-    fun uploadItemToDatabase() {
+    fun uploadItemToDatabase(context: Context) {
         val itemName = _itemName.value
         val itemPrice = _itemPrice.value
         val itemDescription = _itemDescription.value
+        val imageBase64 = photoUri?.let { ImageConverter().uriToBase64(context, it) }
+        val  userID = SessionManager(context).userId
 
         // Validate input (add your validation logic here)
-
-        // Perform the upload using a coroutine
         viewModelScope.launch {
             try {
-                // You can use the values of itemName, itemPrice, itemDescription to build your ArtItemRequest
-                // Call your API service here to upload the item
-                // Example:
-                val artItemRequest = ArtItemRequest(name = itemName, price = itemPrice, image = "", description = itemDescription, userId = "your_user_id_here")
+                val artItemRequest = ArtItemRequest(name = itemName, price = itemPrice, image = imageBase64 ?: "", description = itemDescription, userId = userID ?: "")
                 val response = withContext(Dispatchers.IO){
                     GalleryApi.retrofitService.uploadItem(artItemRequest).execute()
                 }
@@ -67,6 +59,7 @@ class UploadViewModel : ViewModel() {
                         val uploadRequest = response.body()
                         if (uploadRequest?.isSuccessful == true){
                             Log.d("Upload View Model", "Upload successful")
+
                         }else{
                             Log.d("Upload View Model", "Upload Failed")
                         }

@@ -2,6 +2,7 @@ package com.example.galleryapp.network
 import androidx.compose.runtime.State
 import com.example.galleryapp.ui.screens.account.UserResponse
 import com.example.galleryapp.ui.screens.home.ArtsResponse
+import com.example.galleryapp.ui.screens.itemDetails.DeleteResponse
 import com.example.galleryapp.ui.screens.itemDetails.ItemDetailsResponse
 import com.example.galleryapp.ui.screens.register.User
 import com.example.galleryapp.ui.screens.upload.ArtItemRequest
@@ -12,6 +13,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -42,8 +44,9 @@ interface GalleryApiService{
     @GET("api/v1/art/all")
     suspend fun getAllArt(): Response<ArtsResponse>
     @GET("api/v1/art/by-id/{id}")
-    suspend fun getItemDetails(@Path("id") id: State<String>): Response<ItemDetailsResponse>
-
+    suspend fun getItemDetails(@Path("id") id: String): Response<ItemDetailsResponse>
+    @DELETE("api/v1/art/{id}")
+    suspend fun deleteItem(@Path("id") id: String): Response<DeleteResponse>
 }
 object GalleryApi{
     val retrofitService: GalleryApiService by lazy {

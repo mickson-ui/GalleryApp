@@ -50,16 +50,13 @@ fun NavGraph(
     ) {
         composable(Screen.HomePage.route) {
             currentRoute = Screen.HomePage.route
-            HomePage(navController = navController,
-                onItemSelected = { onItemSelected ->
-                    navController.navigate("${Screen.ItemDetailsPage.route}/$onItemSelected")
-                }/*, onFavoriteClicked = {}*/)
+            HomePage(navController = navController)
         }
-        composable(Screen.ItemDetailsPage.route + "/{onItemSelected}") { backStackEntry ->
-            val onItemSelected = rememberUpdatedState(backStackEntry.arguments?.getString("onItemSelected") ?: "")
+        composable(Screen.ItemDetailsPage.route + "/{itemId}") { backStackEntry ->
+            val itemId = rememberUpdatedState(backStackEntry.arguments?.getString("itemId") ?: "")
             ItemDetailsPage(
                 navController = navController,
-                selectedItem = onItemSelected
+                selectedItem = itemId
             ) {}
         }
         composable(Screen.CartPage.route) {
